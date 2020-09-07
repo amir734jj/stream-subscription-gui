@@ -31,7 +31,6 @@ public class AudioService {
     public String getCurrentSong() {
         return currentSong;
     }
-
     public AudioService() {
         this.logger = LogManager.getLogger(AudioService.class);
     }

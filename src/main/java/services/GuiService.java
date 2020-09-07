@@ -20,11 +20,11 @@ public class GuiService {
         this.logger = LogManager.getLogger(GuiService.class);
     }
 
-    public void init() throws IOException {
+    public void init() {
         // creating the frame
         JFrame frame = new JFrame("Stream Subscription");
         frame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        frame.setSize(300, 100);
+        frame.setSize(500, 200);
         frame.setLocationRelativeTo(null);
 
         // creating the panel
@@ -45,26 +45,21 @@ public class GuiService {
 
         panel.add(skipButton);
         frame.getContentPane().add(BorderLayout.CENTER, panel);
-
         frame.setVisible(true);
 
-        new Thread(() -> {
-            while (true) {
-                try {
-                    skipButton.setEnabled(this.audioService.isPlaying());
-                    label.setText(this.audioService.isPlaying() ? this.audioService.getCurrentSong() : "Waiting ...");
+        new Timer(1000, e -> {
+            skipButton.setEnabled(this.audioService.isPlaying());
+            label.setText(this.audioService.isPlaying() ? this.audioService.getCurrentSong() : "Waiting ...");
 
-                    panel.revalidate();
-                    panel.repaint();
-                    SwingUtilities.updateComponentTreeUI(frame);
-
-                    Thread.sleep(2000);
-                } catch (InterruptedException e) {
-                    logger.error("Stream watcher failed", e);
-                }
-            }
+            SwingUtilities.updateComponentTreeUI(frame);
         }).start();
 
-        this.hubService.listen();
+        new Thread(() ->  {
+            try {
+                this.hubService.listen();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }).run();
     }
 }

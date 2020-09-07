@@ -4,6 +4,7 @@ import models.Config;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.*;
+import services.AudioService;
 import services.GuiService;
 import services.HubService;
 
@@ -32,6 +33,9 @@ public class Driver {
         easyDI.bindInstance(Config.class, config);
         easyDI.bindInstance(ObjectMapper.class, new ObjectMapper());
         easyDI.bindInstance(HttpClient.class, HttpClientBuilder.create().build());
+        easyDI.markAsSingleton(AudioService.class);
+        easyDI.markAsSingleton(GuiService.class);
+        easyDI.markAsSingleton(HubService.class);
 
         easyDI.getInstance(GuiService.class).init();
 
