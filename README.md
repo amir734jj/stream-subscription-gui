@@ -7,3 +7,5 @@ Libraries:
 - Log4j
 - easyDI
 - Apache Commons
+- jackson
+- jlayer
