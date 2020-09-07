@@ -29,8 +29,8 @@ public class Driver {
 
         Config config = new Config();
         config.setUrl("https://stream-subscription-api.herokuapp.com");
-        config.setUsername("username");
-        config.setPassword("password");
+        config.setUsername(System.getenv("username"));
+        config.setPassword(System.getenv("password"));
 
         easyDI.bindInstance(Config.class, config);
         easyDI.bindInstance(ObjectMapper.class, new ObjectMapper());
