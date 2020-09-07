@@ -4,6 +4,7 @@ import com.microsoft.signalr.HubConnection;
 import com.microsoft.signalr.HubConnectionBuilder;
 import io.reactivex.Completable;
 import io.reactivex.Single;
+import javazoom.jl.decoder.JavaLayerException;
 import models.Config;
 import models.SongMetadata;
 import models.Stream;
@@ -11,6 +12,7 @@ import org.apache.log4j.LogManager;
 import org.apache.log4j.Logger;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.util.concurrent.FutureTask;
 
 public class HubService {
@@ -48,13 +50,16 @@ public class HubService {
             }
         });
 
-//        hubConnection.on("log", thing -> System.out.println(thing), String.class);
+        hubConnection.on("log", logger::trace, String.class);
 
-        hubConnection.on("download", (String filename, SongMetadata songMetadata, String base64, Stream stream) -> new FutureTask<Void>(() -> {
+        hubConnection.on("download", (String filename, SongMetadata songMetadata, String base64, Stream stream) -> new Thread(() -> {
             logger.trace("Downloaded: " + filename);
-            this.audioService.queue(filename, this.fileService.base64ToStream(base64));
-            return null;
-        }).run(), String.class, SongMetadata.class, String.class, Stream.class);
+            try {
+                this.audioService.queue(filename, this.fileService.base64ToStream(base64));
+            } catch (JavaLayerException | UnsupportedEncodingException e) {
+                logger.error(e);
+            }
+        }).start(), String.class, SongMetadata.class, String.class, Stream.class);
 
         return hubConnection.start();
     }
