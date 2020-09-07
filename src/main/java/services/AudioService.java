@@ -22,6 +22,15 @@ public class AudioService {
     private AdvancedPlayer player;
 
     private boolean playing = false;
+    private String currentSong = "";
+
+    public boolean isPlaying() {
+        return playing;
+    }
+
+    public String getCurrentSong() {
+        return currentSong;
+    }
 
     public AudioService() {
         this.logger = LogManager.getLogger(AudioService.class);
@@ -29,17 +38,23 @@ public class AudioService {
 
     public void queue(String name, byte[] bytes) throws JavaLayerException {
         this.queue.add(Pair.of(name,  ArrayUtils.toObject(bytes)));
-        play();
+        this.pickFromQueueAndPlay();
     }
 
     public void skip() throws JavaLayerException {
         this.playing = false;
         this.player.stop();
         this.player.close();
-        this.play();
+        this.pickFromQueueAndPlay();
     }
 
-    private void play() throws JavaLayerException {
+    public void pause() {
+        if (this.playing) {
+            this.player.stop();
+        }
+    }
+
+    private void pickFromQueueAndPlay() throws JavaLayerException {
         if (playing) {
             return;
         }
@@ -51,6 +66,7 @@ public class AudioService {
             return;
         }
 
+        this.currentSong = item.getKey();
         logger.trace("Playing: " + item.getKey());
 
         InputStream stream = new ByteArrayInputStream(ArrayUtils.toPrimitive(item.getValue()));
@@ -61,7 +77,7 @@ public class AudioService {
                 logger.trace("Finished playing");
                 playing = false;
                 try {
-                    play();
+                    pickFromQueueAndPlay();
                 } catch (JavaLayerException e) {
                     logger.error("Failed playing", e);
                 }

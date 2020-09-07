@@ -13,7 +13,6 @@ import org.apache.log4j.Logger;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.util.concurrent.FutureTask;
 
 public class HubService {
     private final Logger logger;
