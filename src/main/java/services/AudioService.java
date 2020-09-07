@@ -19,6 +19,7 @@ public class AudioService {
 
     private final Queue<Pair<String, Byte[]>> queue = new CircularFifoQueue<>(10);
     private final Logger logger;
+    private AdvancedPlayer player;
 
     private boolean playing = false;
 
@@ -31,6 +32,13 @@ public class AudioService {
         play();
     }
 
+    public void skip() throws JavaLayerException {
+        this.playing = false;
+        this.player.stop();
+        this.player.close();
+        this.play();
+    }
+
     private void play() throws JavaLayerException {
         if (playing) {
             return;
@@ -38,11 +46,16 @@ public class AudioService {
 
         Pair<String, Byte[]> item = this.queue.poll();
 
+        // Nothing to play
+        if (item == null) {
+            return;
+        }
+
         logger.trace("Playing: " + item.getKey());
 
         InputStream stream = new ByteArrayInputStream(ArrayUtils.toPrimitive(item.getValue()));
-        AdvancedPlayer player = new AdvancedPlayer(stream);
-        player.setPlayBackListener(new PlaybackListener() {
+        this.player = new AdvancedPlayer(stream);
+        this.player.setPlayBackListener(new PlaybackListener() {
             @Override
             public void playbackFinished(PlaybackEvent evt) {
                 logger.trace("Finished playing");
@@ -60,6 +73,6 @@ public class AudioService {
                 playing = true;
             }
         });
-        player.play();
+        this.player.play();
     }
 }

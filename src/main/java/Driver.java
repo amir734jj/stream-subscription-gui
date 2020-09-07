@@ -4,6 +4,7 @@ import models.Config;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.*;
+import services.GuiService;
 import services.HubService;
 
 import java.io.IOException;
@@ -32,9 +33,7 @@ public class Driver {
         easyDI.bindInstance(ObjectMapper.class, new ObjectMapper());
         easyDI.bindInstance(HttpClient.class, HttpClientBuilder.create().build());
 
-        HubService hubService = easyDI.getInstance(HubService.class);
-
-        hubService.listen().blockingAwait();
+        easyDI.getInstance(GuiService.class).init();
 
         rootLogger.trace("Terminated the app");
     }
