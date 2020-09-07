@@ -13,7 +13,7 @@ public class Driver {
     public static void main(String[] args) throws IOException, InterruptedException {
 
         Logger rootLogger = LogManager.getRootLogger();
-        rootLogger.setLevel(Level.ALL);
+        rootLogger.setLevel(Level.ERROR);
 
         ConsoleAppender consoleAppender = new ConsoleAppender();
         String PATTERN = "%d [%p|%c|%C{1}] %m%n";

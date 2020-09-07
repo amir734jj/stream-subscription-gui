@@ -49,8 +49,8 @@ public class HubService {
             }
         });
 
-        hubConnection.on("log", logger::trace, String.class);
-
+        hubConnection.on("log", (x) -> { }, String.class);
+        hubConnection.on("count", x -> { }, Integer.class);
         hubConnection.on("download", (String filename, SongMetadata songMetadata, String base64, Stream stream) -> new Thread(() -> {
             logger.trace("Downloaded: " + filename);
             try {

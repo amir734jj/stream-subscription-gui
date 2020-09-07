@@ -54,14 +54,11 @@ public class GuiService {
                     skipButton.setEnabled(this.audioService.isPlaying());
                     label.setText(this.audioService.isPlaying() ? this.audioService.getCurrentSong() : "Waiting ...");
 
+                    panel.revalidate();
+                    panel.repaint();
                     SwingUtilities.updateComponentTreeUI(frame);
-                    frame.doLayout();
 
-//                    frame.invalidate();
-                    frame.validate();
-//                    frame.repaint();
-
-                    Thread.sleep(1000);
+                    Thread.sleep(2000);
                 } catch (InterruptedException e) {
                     logger.error("Stream watcher failed", e);
                 }
