@@ -6,6 +6,7 @@ import io.reactivex.Single;
 import models.Config;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
+import org.apache.log4j.*;
 import services.AuthService;
 import services.HubService;
 
@@ -13,6 +14,16 @@ import java.io.IOException;
 
 public class Driver {
     public static void main(String[] args) throws IOException, InterruptedException {
+
+        Logger rootLogger = LogManager.getRootLogger();
+        rootLogger.setLevel(Level.ALL);
+
+        ConsoleAppender consoleAppender = new ConsoleAppender();
+        String PATTERN = "%d [%p|%c|%C{1}] %m%n";
+        consoleAppender.setLayout(new PatternLayout(PATTERN));
+        consoleAppender.setThreshold(Level.TRACE);
+        consoleAppender.activateOptions();
+        rootLogger.addAppender(consoleAppender);
 
         EasyDI easyDI = new EasyDI();
 
@@ -27,6 +38,8 @@ public class Driver {
 
         HubService hubService = easyDI.getInstance(HubService.class);
 
-        hubService.listen().subscribe();
+        hubService.listen().blockingAwait();
+
+        rootLogger.trace("Terminated the app");
     }
 }
