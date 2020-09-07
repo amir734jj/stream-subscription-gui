@@ -9,7 +9,7 @@ public class SongMetadata {
     private int playCount;
     private String url;
     private String album;
-    private int duration;
+    private double duration;
     private String[] tags;
     private String source;
 
@@ -61,7 +61,7 @@ public class SongMetadata {
         this.album = album;
     }
 
-    public int getDuration() {
+    public double getDuration() {
         return duration;
     }
 

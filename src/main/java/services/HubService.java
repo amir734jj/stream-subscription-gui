@@ -11,6 +11,8 @@ import models.Stream;
 
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.util.concurrent.Future;
+import java.util.concurrent.FutureTask;
 
 public class HubService {
     private Config config;
@@ -30,13 +32,12 @@ public class HubService {
                 .withAccessTokenProvider(Single.just(this.authService.token()))
                 .build();
 
-        hubConnection.on("download", (String filename, SongMetadata songMetadata, String base64, Stream stream) -> {
-            try {
-                this.audioService.Play(filename, this.fileService.base64ToStream(base64));
-            } catch (JavaLayerException | UnsupportedEncodingException e) {
-                e.printStackTrace();
-            }
-        }, String.class, SongMetadata.class, String.class, Stream.class);
+//        hubConnection.on("log", thing -> System.out.println(thing), String.class);
+
+        hubConnection.on("download", (String filename, SongMetadata songMetadata, String base64, Stream stream) -> new FutureTask(() -> {
+            this.audioService.Play(filename, this.fileService.base64ToStream(base64));
+            return null;
+        }).run(), String.class, SongMetadata.class, String.class, Stream.class);
 
         return hubConnection.start();
     }
