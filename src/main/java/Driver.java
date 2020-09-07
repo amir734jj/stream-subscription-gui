@@ -1,13 +1,9 @@
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.microsoft.signalr.HubConnection;
-import com.microsoft.signalr.HubConnectionBuilder;
 import eu.lestard.easydi.EasyDI;
-import io.reactivex.Single;
 import models.Config;
 import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.log4j.*;
-import services.AuthService;
 import services.HubService;
 
 import java.io.IOException;
