@@ -7,6 +7,7 @@ import org.apache.log4j.Logger;
 import javax.swing.*;
 import java.awt.*;
 import java.io.IOException;
+import java.util.concurrent.CompletableFuture;
 
 public class GuiService {
 
@@ -30,26 +31,49 @@ public class GuiService {
         // creating the panel
         JPanel panel = new JPanel();
         JButton skipButton = new JButton("Skip");
+        JButton playButton = new JButton("Play");
+
         skipButton.setEnabled(false);
+        playButton.setEnabled(false);
 
         JLabel label = new JLabel("Waiting ...");
         panel.add(label);
 
         skipButton.addActionListener(actionEvent -> {
-            try {
-                this.audioService.skip();
-            } catch (JavaLayerException e) {
-                logger.error("Failed to handle skip", e);
-            }
+            CompletableFuture.supplyAsync(() -> {
+                try {
+                    this.audioService.skip();
+                } catch (JavaLayerException e) {
+                    logger.error("Failed to handle skip", e);
+                }
+
+                return null;
+            });
         });
 
+        playButton.addActionListener(actionEvent -> {
+            CompletableFuture.supplyAsync(() -> {
+                try {
+                    this.audioService.toggle();
+                } catch (JavaLayerException e) {
+                    logger.error("Failed to play/pause skip", e);
+                }
+                return null;
+            });
+        });
+
+        panel.add(playButton);
         panel.add(skipButton);
+
         frame.getContentPane().add(BorderLayout.CENTER, panel);
         frame.setVisible(true);
 
-        new Timer(1000, e -> {
-            skipButton.setEnabled(this.audioService.isPlaying());
-            label.setText(this.audioService.isPlaying() ? this.audioService.getCurrentSong() : "Waiting ...");
+        new Timer(500, e -> {
+            skipButton.setEnabled(this.audioService.isAvailable());
+            playButton.setEnabled(this.audioService.isAvailable() || this.audioService.isPlaying());
+
+            label.setText(!this.audioService.getCurrentSong().isEmpty() ? this.audioService.getCurrentSong() : "Waiting ...");
+            playButton.setText(this.audioService.isPlaying() ? "Pause" : "Play");
 
             SwingUtilities.updateComponentTreeUI(frame);
         }).start();
@@ -60,6 +84,6 @@ public class GuiService {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-        }).run();
+        }).start();
     }
 }
